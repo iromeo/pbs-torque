@@ -1,4 +1,4 @@
-cluster: "$((INSTALDIR))/pbs-submit.py --depend \"{dependencies}\""
+cluster: "$((INSTALDIR))/pbs-submit.py --depend \"{dependencies}\" -j oe"
 cluster-status: "$((INSTALDIR))/pbs-status.py"
 jobscript: "$((INSTALDIR))/pbs-jobscript.sh"
 jobs: 5000

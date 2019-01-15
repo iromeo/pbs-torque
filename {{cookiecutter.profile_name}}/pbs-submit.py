@@ -150,6 +150,7 @@ walltime = ""
 # 4. consider using job_properties["params"] because resources expects numbers, not string values
 # 5. is walltime in "HH:MM:SS" is possible?
 # 6. specify queue: --config or params...
+# 7. pass "-j oe" via cluster
 
 cluster_params = job_properties["cluster"]
 if "j" in cluster_params:
