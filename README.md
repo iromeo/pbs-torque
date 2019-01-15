@@ -22,7 +22,8 @@ Then, you can run Snakemake with
 The following resources are supported by on a per-rule basis:
 
 **node** - set the ppn resource request (defaults to the thread declaration).  
-**mem** - set the memory resource request (bytes).  
+**mem** - set the node RAM memory resource request (bytes).  
+**vmem** - set the virtual memory resource request (bytes).  
 **walltime** - set the walltime resource (secs).  
 
 Also you could configure `qsub` cmdline options in `config.yaml` using `pbs-submit.py` cmdline 

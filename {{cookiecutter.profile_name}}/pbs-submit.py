@@ -73,7 +73,6 @@ eall = ""
 wd = ""
 add = ""
 depend = ""
-resourceparams = ""
 extras = ""
 
 if args.depend:
@@ -140,7 +139,18 @@ if args.W:
 nodes = ""
 ppn = ""
 mem = ""
+vmem = ""
 walltime = ""
+
+# TODO: rewrite this.., e.g.
+# 1. use key dictionary for qsub args
+# 2. take defaults if set from cluster params,
+#        cluster_params = job_properties["cluster"]
+# 3. add `job_properties["resources"]` values to cluster_params
+# 4. consider using job_properties["params"] because resources expects numbers, not string values
+# 5. todo ensure job_properties["resources"] is always set but could be empty
+# 6. is walltime in "HH:MM:SS" is possible?
+
 
 if "threads" in job_properties:
     ppn = "ppn=" + str(job_properties["threads"])
@@ -153,25 +163,18 @@ if "resources" in job_properties:
         nodes = "nodes=1"
     if "mem" in resources:
         mem = "mem=" + str(resources["mem"])
+    if "vmem" in resources:
+        vmem = "vmem=" + str(resources["vmem"])
     if "walltime" in resources:
         walltime = "walltime=" + str(resources["walltime"])
 
-if nodes or ppn or mem or walltime:
-    resourceparams = " -l \""
-if nodes:
-    resourceparams = resourceparams + nodes
-if nodes and ppn:
-    resourceparams = resourceparams + ":" + ppn
-if nodes and mem:
-    resourceparams = resourceparams + ","
-if mem:
-    resourceparams = resourceparams + mem
-if walltime and (nodes or mem):
-    resourceparams = resourceparams + ","
-if walltime:
-    resourceparams = resourceparams + walltime
-if nodes or mem or walltime:
-    resourceparams = resourceparams + "\""
+# -l option: Resource params list:
+resourceparams = ""
+resourceparams_list = ["{}:{}".format(nodes, ppn) if ppn else nodes]
+resourceparams_list.extend([mem, vmem, walltime])
+resourceparams_list = [s for s in resourceparams_list if s]
+if resourceparams_list:
+    resourceparams = ' -l "{}"'.format(",".join(resourceparams_list))
 
 cmd = "qsub {a}{A}{b}{c}{C}{d}{D}{e}{f}{h}{j}{l}{m}{M}{N}{o}{p}{P}{q}{t}{u}{v}{V}{w}{W}{rp}{dep}" \
       "{ex}".format(a=atime, A=acc_string, b=pbs_time, c=chkpt, C=pref, d=dd, D=rd, e=se, f=ft,
