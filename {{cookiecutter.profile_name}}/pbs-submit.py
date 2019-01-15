@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-import os
 import sys
 import argparse
 import subprocess
 
 from snakemake.utils import read_job_properties
 
+# Use this cmdline args in `config.yaml` cluster cmdline options:
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument("--depend",
                     help="Space separated list of ids for jobs this job should depend on.")
