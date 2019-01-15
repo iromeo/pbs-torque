@@ -151,6 +151,9 @@ walltime = ""
 # 5. todo ensure job_properties["resources"] is always set but could be empty
 # 6. is walltime in "HH:MM:SS" is possible?
 
+cluster_params = job_properties["cluster"]
+if "j" in cluster_params:
+    j = " -j " + cluster_params["j"]
 
 if "threads" in job_properties:
     ppn = "ppn=" + str(job_properties["threads"])
