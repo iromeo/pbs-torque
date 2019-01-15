@@ -148,8 +148,8 @@ walltime = ""
 #        cluster_params = job_properties["cluster"]
 # 3. add `job_properties["resources"]` values to cluster_params
 # 4. consider using job_properties["params"] because resources expects numbers, not string values
-# 5. todo ensure job_properties["resources"] is always set but could be empty
-# 6. is walltime in "HH:MM:SS" is possible?
+# 5. is walltime in "HH:MM:SS" is possible?
+# 6. specify queue: --config or params...
 
 cluster_params = job_properties["cluster"]
 if "j" in cluster_params:
@@ -157,6 +157,9 @@ if "j" in cluster_params:
 
 if "threads" in job_properties:
     ppn = "ppn=" + str(job_properties["threads"])
+
+if "log" in job_properties:
+    so = " -o {}".format(job_properties["log"][0])
 
 if "resources" in job_properties:
     resources = job_properties["resources"]
@@ -166,8 +169,9 @@ if "resources" in job_properties:
         nodes = "nodes=1"
     if "mem" in resources:
         mem = "mem=" + str(resources["mem"])
-    if "vmem" in resources:
-        vmem = "vmem=" + str(resources["vmem"])
+    if "vmem_gb" in resources:
+        vmem_value = resources["vmem_gb"]
+        vmem = "vmem={}gb".format(resources["vmem_gb"])
     if "walltime" in resources:
         walltime = "walltime=" + str(resources["walltime"])
 
@@ -186,6 +190,7 @@ cmd = "qsub {a}{A}{b}{c}{C}{d}{D}{e}{f}{h}{j}{l}{m}{M}{N}{o}{p}{P}{q}{t}{u}{v}{V
                     dep=depend, ex=extras
                     )
 
+print("Job qsub cmdline: ", cmd, file=sys.stderr)
 try:
     res = subprocess.run(cmd, check=True, shell=True, stdout=subprocess.PIPE)
 except subprocess.CalledProcessError as e:
