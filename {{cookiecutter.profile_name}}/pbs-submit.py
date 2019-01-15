@@ -75,11 +75,12 @@ add = ""
 depend = ""
 extras = ""
 
-if args.depend:
-    for m in args.depend.split(" "):
-        depend = depend + ":" + m
-if depend:
-    depend = " -W \"depend=afterok" + depend + "\""
+# disabled
+# if args.depend:
+#     for m in args.depend.split(" "):
+#         depend = depend + ":" + m
+# if depend:
+#     depend = " -W \"depend=afterok" + depend + "\""
 
 if args.positional:
     for m in args.positional:
@@ -151,6 +152,7 @@ walltime = ""
 # 5. is walltime in "HH:MM:SS" is possible?
 # 6. specify queue: --config or params...
 # 7. pass "-j oe" via cluster
+# 8. by default do not add job dependencies (washu not support this)
 
 cluster_params = job_properties["cluster"]
 if "j" in cluster_params:
