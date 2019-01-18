@@ -3,6 +3,23 @@ import sys
 import argparse
 import subprocess
 
+# TODO: rewrite this.., e.g.
+# 1. use key dictionary for qsub args
+# 2. take defaults if set from cluster params,
+#        cluster_params = job_properties["cluster"]
+# 3. add `job_properties["resources"]` values to cluster_params
+# 4. consider using job_properties["params"] because resources expects numbers, not string values
+# 5. is walltime in "HH:MM:SS" is possible?
+# 6. specify queue: --config or params...
+# 7. pass "-j oe" via cluster
+# 8. by default do not add job dependencies (washu not support this)
+#
+# TODO: maybe accept general "mem" option and using --cluster-config chose how to pass it to
+# cluster, like 'mem', 'vmem', etc
+# also see: https://bitbucket.org/snakemake/snakemake/issues/279/unifying-resources-and-cluster-config
+# Parameters defined in the cluster config file are now accessible in the job properties under the key “cluster”.
+
+
 from snakemake.utils import read_job_properties
 
 # Use this cmdline args in `config.yaml` cluster cmdline options:
@@ -143,17 +160,6 @@ mem = ""
 vmem = ""
 walltime = ""
 
-# TODO: rewrite this.., e.g.
-# 1. use key dictionary for qsub args
-# 2. take defaults if set from cluster params,
-#        cluster_params = job_properties["cluster"]
-# 3. add `job_properties["resources"]` values to cluster_params
-# 4. consider using job_properties["params"] because resources expects numbers, not string values
-# 5. is walltime in "HH:MM:SS" is possible?
-# 6. specify queue: --config or params...
-# 7. pass "-j oe" via cluster
-# 8. by default do not add job dependencies (washu not support this)
-
 cluster_params = job_properties["cluster"]
 if "j" in cluster_params:
     j = " -j " + cluster_params["j"]
@@ -161,8 +167,15 @@ if "j" in cluster_params:
 if "threads" in job_properties:
     ppn = "ppn=" + str(job_properties["threads"])
 
+# if "cluster_log" in job_properties["params"]:
+#     so = " -o {}".format(job_properties["params"]["cluster_log"])
+# else:
 if "log" in job_properties:
-    so = " -o {}".format(job_properties["log"][0])
+    log = job_properties["log"]
+    if log:
+        so = " -o {}_job.log".format(log[0])
+
+# TODO: else conider "log.cluster" if named logs
 
 if "resources" in job_properties:
     resources = job_properties["resources"]
@@ -175,8 +188,13 @@ if "resources" in job_properties:
     if "vmem_gb" in resources:
         vmem_value = resources["vmem_gb"]
         vmem = "vmem={}gb".format(resources["vmem_gb"])
+
     if "walltime" in resources:
         walltime = "walltime=" + str(resources["walltime"])
+    elif "walltime_h" in resources:
+        walltime = "walltime={}:00:00".format(resources["walltime_h"])
+    elif "walltime_m" in resources:
+        walltime = "walltime=00:{}:00".format(resources["walltime_m"])
 
 # -l option: Resource params list:
 resourceparams = ""
